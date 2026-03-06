@@ -220,3 +220,7 @@ const Alerts = (() => {
 
     return { init, handleIncoming, simulateAlert, stop };
 })();
+
+// Register globally
+window.Alerts = Alerts;
+

@@ -14,8 +14,7 @@ const AppState = {
   isDemoMode: false
 };
 
-// Global Demo Gate
-window.isDemoMode = sessionStorage.getItem('demoMode') === 'true';
+// Demo gate is set by main.js
 
 const Dashboard = (() => {
   const NAV_CONFIG = {
@@ -55,7 +54,7 @@ const Dashboard = (() => {
         // 2. REAL AUTH CHECK
         const session = await Auth.getSession();
         if (!session) {
-          window.location.href = 'index.html';
+          window.location.href = '/';
           return;
         }
         AppState.user = session.user;
@@ -141,30 +140,37 @@ const Dashboard = (() => {
 
   function renderSidebar() {
     const nav = document.querySelector('.sidebar-nav');
+    const footer = document.getElementById('sidebarFooter');
     const items = NAV_CONFIG[AppState.role] || [];
 
-    nav.innerHTML = items.map(item => `
-      <div class="nav-item ${AppState.activeSection === item.id ? 'active' : ''}" 
-           onclick="Dashboard.switchSection('${item.id}')">
-        <span class="nav-icon">${NAV_ICONS[item.icon] || item.label[0]}</span>
-        <span class="nav-label">${item.label}</span>
-      </div>
-    `).join('') + `
-      <div class="nav-item logout mt-auto" onclick="Auth.signOut()">
-        <span class="nav-icon">${NAV_ICONS.logout}</span>
-        <span class="nav-label">Logout</span>
-      </div>
-    `;
+    if (nav) {
+      nav.innerHTML = items.map(item => `
+        <div class="nav-item ${AppState.activeSection === item.id ? 'active' : ''}" 
+             onclick="Dashboard.switchSection('${item.id}')">
+          <span class="nav-icon">${NAV_ICONS[item.icon] || item.label[0]}</span>
+          <span class="nav-label">${item.label}</span>
+        </div>
+      `).join('');
+    }
+
+    if (footer) {
+      footer.innerHTML = `
+        <div class="nav-item logout" onclick="Auth.signOut()">
+          <span class="nav-icon">${NAV_ICONS.logout}</span>
+          <span class="nav-label">Logout</span>
+        </div>
+      `;
+    }
 
     // Sidebar User Info
     const displayName = AppState.displayName || 'Demo User';
-    document.getElementById('userName').textContent = displayName;
-    document.getElementById('userRoleText').textContent =
-      AppState.specialization || AppState.role.toUpperCase();
+    const userNameEl = document.getElementById('userName');
+    const userRoleEl = document.getElementById('userRoleText');
+    const avatarEl = document.getElementById('userAvatar');
 
-    // Avatar Initial
-    const avatar = document.getElementById('userAvatar');
-    if (avatar) avatar.textContent = displayName[0].toUpperCase();
+    if (userNameEl) userNameEl.textContent = displayName;
+    if (userRoleEl) userRoleEl.textContent = AppState.specialization || AppState.role.toUpperCase();
+    if (avatarEl) avatarEl.textContent = displayName[0].toUpperCase();
   }
 
   function updateHeader() {
@@ -285,7 +291,7 @@ const Dashboard = (() => {
           <div class="section-card">
             <div class="section-header">
               <h3 class="section-title">Active Unit Monitor</h3>
-              <button class="btn btn-sm btn-primary" onclick="UI.openModal('patientModal')">
+              <button class="btn btn-sm btn-primary" id="newAdmissionBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 New Admission
               </button>
@@ -297,8 +303,25 @@ const Dashboard = (() => {
         </div>
       </div>
     `;
+
+    // Robust Admission Binding
     Patients.load();
   }
+
+  // Global Event Delegation for Admission Modal
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#newAdmissionBtn')) {
+      e.preventDefault();
+      UI.openModal('admissionModal');
+    }
+  });
+
+  document.addEventListener('submit', (e) => {
+    if (e.target.id === 'admissionForm') {
+      Patients.admitPatient(e);
+    }
+  });
+
 
   function renderReports() {
     const content = document.getElementById('dashboardContent');
@@ -353,5 +376,6 @@ const Dashboard = (() => {
   return { init, switchSection, updateHeader };
 })();
 
-// Bootstrap
-document.addEventListener('DOMContentLoaded', Dashboard.init);
+// Register globally — init is called by main.js, NOT DOMContentLoaded
+window.Dashboard = Dashboard;
+window.AppState = AppState;

@@ -1,64 +1,271 @@
+/* =============================================
+   CARENIUM — Application Entry Point
+   Single orchestrator: init, routing, event binding.
+   ============================================= */
+
+// ── 1. Supabase MUST initialize first ──
+import './supabase-config.js';
+
+// ── 2. Core utilities (no dependencies) ──
+import './ui.js';
+import './theme.js';
+import './router.js';
+
+// ── 3. Auth & Demo data ──
 import './auth.js';
-import './dashboard.js';
 import './demo.js';
 
-// Global error handler for production
-window.addEventListener("error", (e) => {
-    console.error("Production error:", e.message);
+// ── 4. API layer (uses supabase lazily) ──
+import './api.js';
+
+// ── 5. Dashboard modules ──
+import './dashboard.js';
+import './patients.js';
+import './profile.js';
+import './staff.js';
+import './appointments.js';
+import './alerts.js';
+import './doctor-actions.js';
+import './realtime.js';
+
+// ── Global Error Handler ──
+window.addEventListener('error', (e) => {
+    console.error('Carenium Runtime Error:', e.message, e.filename, e.lineno);
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Check for Demo Mode setup (Phase 6)
-    const isDemo = sessionStorage.getItem("demo") === "true";
-    window.isDemoMode = isDemo; // Set globally
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Carenium Unhandled Promise:', e.reason);
+});
 
-    // 2. Setup Route Logic
-    const path = window.location.pathname;
+// ── Main Init ──
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Carenium app started");
 
-    if (path === '/dashboard') {
-        renderDashboard();
+    // Set demo mode flag globally
+    window.isDemoMode = sessionStorage.getItem('demoMode') === 'true';
+
+    // Start Router
+    if (window.Router) {
+        window.Router.init();
     } else {
-        renderLogin();
+        console.error("Carenium: Router module not found");
     }
 });
 
-async function renderLogin() {
-    // Reveal Login UI elements
+// ═══════════════════════════════════════════════
+//  LOGIN PAGE LOGIC
+// ═══════════════════════════════════════════════
+
+window.initLogin = function () {
     const loginPage = document.querySelector('.login-page');
-    if (loginPage) loginPage.style.display = 'block';
+    if (loginPage) loginPage.style.display = '';
 
-    const dashboardRoot = document.getElementById('dashboardRoot');
-    if (dashboardRoot) dashboardRoot.style.display = 'none';
+    // Check if already logged in → redirect to dashboard
+    checkExistingSession();
 
-    // Existing Auth initialization logic via imported files will trigger on login DOM forms
-    // Let's add the small delay guard as requested in Phase 5
-    await new Promise(r => setTimeout(r, 50));
+    // ── Tab Switching ──
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabSignUp = document.getElementById('tabSignUp');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const signupSuccess = document.getElementById('signupSuccess');
+    const tabIndicator = document.getElementById('tabIndicator');
+    const authSwitch = document.getElementById('authSwitch');
+    const switchToSignup = document.getElementById('switchToSignup');
 
-    // Redirect if already authenticated
-    if (!window.isDemoMode) {
-        const session = await window.Auth?.getSession();
-        if (session && window.location.pathname === "/") {
-            window.location.replace("/dashboard");
+    function showSignIn() {
+        tabSignIn?.classList.add('active');
+        tabSignUp?.classList.remove('active');
+        loginForm?.classList.add('active');
+        signupForm?.classList.remove('active');
+        signupSuccess?.classList.remove('active');
+        if (signupSuccess) signupSuccess.style.display = 'none';
+        if (tabIndicator) tabIndicator.style.transform = 'translateX(0)';
+        if (authSwitch) authSwitch.innerHTML = 'Don\'t have an account? <a href="#" id="switchToSignup">Create one</a>';
+        // Re-bind the dynamic link
+        document.getElementById('switchToSignup')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSignUp();
+        });
+        hideError();
+    }
+
+    function showSignUp() {
+        tabSignUp?.classList.add('active');
+        tabSignIn?.classList.remove('active');
+        signupForm?.classList.add('active');
+        loginForm?.classList.remove('active');
+        signupSuccess?.classList.remove('active');
+        if (signupSuccess) signupSuccess.style.display = 'none';
+        if (tabIndicator) tabIndicator.style.transform = 'translateX(100%)';
+        if (authSwitch) authSwitch.innerHTML = 'Already have an account? <a href="#" id="switchToSignIn">Sign In</a>';
+        document.getElementById('switchToSignIn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSignIn();
+        });
+        hideError();
+    }
+
+    tabSignIn?.addEventListener('click', showSignIn);
+    tabSignUp?.addEventListener('click', showSignUp);
+    switchToSignup?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSignUp();
+    });
+
+    // ── Login Form Submit ──
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail')?.value?.trim();
+        const password = document.getElementById('loginPassword')?.value;
+        const btn = document.getElementById('loginBtn');
+
+        if (!email || !password) {
+            showError('Please enter your email and password.');
+            return;
         }
+
+        setLoading(btn, true);
+        hideError();
+
+        const result = await Auth.signIn(email, password);
+
+        if (result.success) {
+            window.location.href = '/dashboard';
+        } else {
+            showError(result.message || 'Login failed. Please try again.');
+            setLoading(btn, false);
+        }
+    });
+
+    // ── Signup Form Submit ──
+    signupForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('signupName')?.value?.trim();
+        const email = document.getElementById('signupEmail')?.value?.trim();
+        const phone = document.getElementById('signupPhone')?.value?.trim() || '';
+        const password = document.getElementById('signupPassword')?.value;
+        const confirmPassword = document.getElementById('signupConfirmPassword')?.value;
+        const role = document.getElementById('signupRole')?.value;
+        const terms = document.getElementById('signupTerms')?.checked;
+        const btn = document.getElementById('signupBtn');
+
+        // Validation
+        if (!name || !email || !password || !role) {
+            showError('Please fill in all required fields.');
+            return;
+        }
+        if (password.length < 6) {
+            showError('Password must be at least 6 characters.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            showError('Passwords do not match.');
+            return;
+        }
+        if (!terms) {
+            showError('You must agree to the Terms of Service.');
+            return;
+        }
+
+        setLoading(btn, true);
+        hideError();
+
+        const result = await Auth.signUp(email, password, name, role, phone);
+
+        if (result.success) {
+            // Show success panel
+            loginForm?.classList.remove('active');
+            signupForm?.classList.remove('active');
+            signupSuccess?.classList.add('active');
+            if (signupSuccess) signupSuccess.style.display = '';
+        } else {
+            showError(result.message || 'Signup failed. Please try again.');
+        }
+        setLoading(btn, false);
+    });
+
+    // ── Back to Sign In (from success panel) ──
+    document.getElementById('backToSignIn')?.addEventListener('click', showSignIn);
+
+    // ── Demo Access Button ──
+    const demoBtn = document.getElementById('demoAccessBtn');
+    demoBtn?.addEventListener('click', () => {
+        sessionStorage.setItem('demoMode', 'true');
+        window.isDemoMode = true;
+        window.location.href = '/dashboard';
+    });
+
+    // ── Password Toggle ──
+    setupPasswordToggle('passwordToggle', 'loginPassword');
+    setupPasswordToggle('signupPasswordToggle', 'signupPassword');
+}
+
+function setupPasswordToggle(toggleId, inputId) {
+    const toggle = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    if (!toggle || !input) return;
+
+    toggle.addEventListener('click', () => {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const eyeIcon = toggle.querySelector('.icon-eye');
+        const eyeOffIcon = toggle.querySelector('.icon-eye-off');
+        if (eyeIcon) eyeIcon.style.display = isPassword ? 'none' : 'block';
+        if (eyeOffIcon) eyeOffIcon.style.display = isPassword ? 'block' : 'none';
+    });
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('loginError');
+    const errorText = document.getElementById('loginErrorText');
+    if (errorDiv && errorText) {
+        errorText.textContent = message;
+        errorDiv.style.display = 'flex';
     }
 }
 
-async function renderDashboard() {
-    // Hide Login UI
+function hideError() {
+    const errorDiv = document.getElementById('loginError');
+    if (errorDiv) errorDiv.style.display = 'none';
+}
+
+function setLoading(btn, loading) {
+    if (!btn) return;
+    btn.disabled = loading;
+    btn.classList.toggle('loading', loading);
+}
+
+async function checkExistingSession() {
+    if (window.isDemoMode) return; // Already demo, don't redirect
+    try {
+        const session = await Auth.getSession();
+        if (session) {
+            window.location.href = '/dashboard';
+        }
+    } catch (e) {
+        // Not logged in, stay on login page
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  DASHBOARD PAGE LOGIC
+// ═══════════════════════════════════════════════
+
+window.initDashboard = function () {
+    // Hide login UI if present
     const loginPage = document.querySelector('.login-page');
     if (loginPage) loginPage.style.display = 'none';
 
-    // Show Dashboard UI root
+    // Create dashboard root if not present
     let dashboardRoot = document.getElementById('dashboardRoot');
-    
-    // Check if we need to load dashboard HTML content dynamically
+
     if (!dashboardRoot) {
         dashboardRoot = document.createElement('div');
         dashboardRoot.id = 'dashboardRoot';
         dashboardRoot.className = 'dashboard-layout';
         document.body.appendChild(dashboardRoot);
-        
-        // We'll populate this with the former dashboard.html layout structure 
+
         dashboardRoot.innerHTML = `
             <!-- Sidebar -->
             <aside class="sidebar glass-panel">
@@ -77,22 +284,26 @@ async function renderDashboard() {
                         <h2 class="brand-text">Carenium</h2>
                     </div>
                 </div>
-                
-                <div class="user-profile-compact">
-                    <div class="avatar" id="userAvatar">D</div>
+
+                <div class="sidebar-user">
+                    <div class="user-avatar" id="userAvatar">D</div>
                     <div class="user-info">
                         <span class="user-name" id="userName">Loading...</span>
-                        <span class="user-role" id="userRoleText">...</span>
+                        <span class="user-role-text" id="userRoleText">...</span>
                     </div>
                 </div>
-                
+
                 <nav class="sidebar-nav">
-                    <!-- Dashboard navigation injected here by dashboard.js -->
+                    <!-- Dashboard navigation injected by dashboard.js -->
                 </nav>
+
+                <div class="sidebar-footer" id="sidebarFooter">
+                    <!-- Logout button injected by dashboard.js -->
+                </div>
             </aside>
-            
+
             <!-- Main Content Area -->
-            <main class="main-wrapper">
+            <main class="main-content">
                 <header class="top-header glass-panel">
                     <div class="header-left">
                         <h1 class="page-title" id="topUserName">Loading Workspace...</h1>
@@ -100,10 +311,16 @@ async function renderDashboard() {
                             <span class="role-badge doctor specialization-badge" id="topRoleBadge">Doctor</span>
                         </div>
                     </div>
-                    
+
                     <div class="header-right">
-                        <!-- Theme Toggle / Notifications -->
                         <button class="icon-btn theme-toggle" id="themeToggleDash" aria-label="Toggle theme">
+                            <svg class="icon-sun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
                             <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                         </button>
                         <button class="icon-btn notification-btn" onclick="UI.togglePanel('notificationPanel')">
@@ -112,18 +329,17 @@ async function renderDashboard() {
                         </button>
                     </div>
                 </header>
-                
+
                 <div class="content-area" id="dashboardContent">
-                    <!-- Dashboard modules will render content here -->
                     <div class="section-loader p-12 text-center">Initializing medical systems...</div>
                 </div>
             </main>
         `;
     } else {
-        dashboardRoot.style.display = 'flex'; // Or whatever its layout mode was
+        dashboardRoot.style.display = 'flex';
     }
 
-    // Initialize Dashboard logic via imported dashboard component 
+    // Initialize the Dashboard module
     if (window.Dashboard) {
         window.Dashboard.init();
     }

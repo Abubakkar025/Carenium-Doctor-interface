@@ -6,14 +6,14 @@
 window.isDemoMode = sessionStorage.getItem('demoMode') === 'true';
 
 const Auth = (() => {
-    const supabase = window.supabaseClient;
+    // Lazy getter — supabase is initialized by supabase-config.js before this runs
+    function sb() { return window.supabaseClient; }
 
     /**
      * Centralized Error Logger & Handler
      */
     function handleError(error, context) {
         console.error(`Carenium Auth [${context}]:`, error);
-        // Integrate with UI toast system if available
         if (window.UI && window.UI.showToast) {
             window.UI.showToast(error.message || 'Authentication error', 'error');
         }
@@ -21,28 +21,21 @@ const Auth = (() => {
     }
 
     function checkSupabase() {
-        if (!supabase) {
+        if (!sb()) {
             return handleError({ message: 'Supabase client not initialized' }, 'Initialization');
         }
         return true;
     }
 
-    /**
-     * Sign In with improved validation and demo cleanup
-     */
     async function signIn(email, password) {
         if (!checkSupabase()) return { success: false, message: 'System unreachable' };
 
         try {
-            // Clear demo mode artifacts on real login attempt
             sessionStorage.removeItem('demoMode');
             window.isDemoMode = false;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
+            const { data, error } = await sb().auth.signInWithPassword({ email, password });
             if (error) throw error;
-
-            // Log successful audit event if needed
             return { success: true, user: data.user };
         } catch (error) {
             let message = error.message || 'Login failed';
@@ -53,14 +46,11 @@ const Auth = (() => {
         }
     }
 
-    /**
-     * Sign Up with RBAC initialization
-     */
     async function signUp(email, password, fullName, role, phone = '') {
         if (!checkSupabase()) return { success: false, message: 'System unreachable' };
 
         try {
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await sb().auth.signUp({
                 email,
                 password,
                 options: {
@@ -72,7 +62,6 @@ const Auth = (() => {
                     }
                 }
             });
-
             if (error) throw error;
             return { success: true, user: data.user };
         } catch (error) {
@@ -80,9 +69,6 @@ const Auth = (() => {
         }
     }
 
-    /**
-     * Secure Sign Out with state cleanup
-     */
     async function signOut() {
         try {
             if (window.isDemoMode) {
@@ -92,31 +78,28 @@ const Auth = (() => {
                 return;
             }
 
-            if (supabase) {
-                await supabase.auth.signOut();
+            if (sb()) {
+                await sb().auth.signOut();
             }
 
             sessionStorage.clear();
-            localStorage.removeItem('carenium-theme'); // Reset theme on logout for security if preferred
+            localStorage.removeItem('carenium-theme');
             window.location.href = '/';
         } catch (error) {
             console.error('SignOut error:', error);
-            window.location.href = '/'; // Force redirect anyway
+            window.location.href = '/';
         }
     }
 
-    /**
-     * Session Retrieval with Demo Mode bypass
-     */
     async function getSession() {
         try {
             if (window.isDemoMode) {
                 return { user: { email: 'demo@carenium.com', user_metadata: { full_name: 'Dr. Demo', role: 'doctor' }, demo: true } };
             }
 
-            if (!supabase) return null;
+            if (!sb()) return null;
 
-            const { data, error } = await supabase.auth.getSession();
+            const { data, error } = await sb().auth.getSession();
             if (error) throw error;
             return data.session;
         } catch (error) {
@@ -125,9 +108,6 @@ const Auth = (() => {
         }
     }
 
-    /**
-     * Routing Guards
-     */
     async function redirectIfLoggedIn() {
         try {
             const session = await getSession();
@@ -165,3 +145,6 @@ const Auth = (() => {
         handleError
     };
 })();
+
+// Register globally so other modules and inline onclick handlers can access it
+window.Auth = Auth;

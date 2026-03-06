@@ -57,3 +57,7 @@ const DemoData = (() => {
         init
     };
 })();
+
+// Register globally
+window.DemoData = DemoData;
+

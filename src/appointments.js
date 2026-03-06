@@ -4,11 +4,11 @@
    ============================================= */
 
 const Appointments = (() => {
-    let appointments = [];
+  let appointments = [];
 
-    async function load() {
-        const content = document.getElementById('dashboardContent');
-        content.innerHTML = `
+  async function load() {
+    const content = document.getElementById('dashboardContent');
+    content.innerHTML = `
           <div class="appointments-container fade-in">
             <div class="section-card p-6">
               <div class="section-header mb-6">
@@ -40,65 +40,65 @@ const Appointments = (() => {
           </div>
         `;
 
-        await fetchAppointments();
+    await fetchAppointments();
+  }
+
+  async function fetchAppointments() {
+    if (AppState.isDemoMode) {
+      appointments = generateDemoAppointments();
+    } else {
+      const result = await API.getAppointments(AppState.user.id);
+      if (result.success) appointments = result.data || [];
+    }
+    renderAppointments();
+  }
+
+  function generateDemoAppointments() {
+    const names = ['Sarah Johnson', 'Michael Chen', 'Lisa Patel', 'James Wilson', 'Emma Garcia'];
+    const statuses = ['scheduled', 'completed', 'scheduled'];
+    const now = new Date();
+    return names.map((name, i) => ({
+      id: `demo-apt-${i}`,
+      patient_name: name,
+      scheduled_at: new Date(now.getTime() + (i - 1) * 3600000).toISOString(),
+      duration_minutes: 30,
+      status: statuses[i % statuses.length],
+      notes: ''
+    }));
+  }
+
+  function renderAppointments() {
+    const today = new Date().toDateString();
+
+    const todayList = appointments.filter(a =>
+      new Date(a.scheduled_at).toDateString() === today
+    );
+    const upcoming = appointments.filter(a =>
+      new Date(a.scheduled_at).toDateString() !== today &&
+      new Date(a.scheduled_at) > new Date()
+    );
+
+    const todayEl = document.getElementById('todayAppointments');
+    const upcomingEl = document.getElementById('upcomingAppointments');
+
+    if (todayEl) {
+      todayEl.innerHTML = todayList.length === 0
+        ? '<p class="empty-text">No appointments today.</p>'
+        : todayList.map(renderAppointmentCard).join('');
     }
 
-    async function fetchAppointments() {
-        if (AppState.isDemoMode) {
-            appointments = generateDemoAppointments();
-        } else {
-            const result = await API.getAppointments(AppState.user.id);
-            if (result.success) appointments = result.data || [];
-        }
-        renderAppointments();
+    if (upcomingEl) {
+      upcomingEl.innerHTML = upcoming.length === 0
+        ? '<p class="empty-text">No upcoming appointments.</p>'
+        : upcoming.map(renderAppointmentCard).join('');
     }
+  }
 
-    function generateDemoAppointments() {
-        const names = ['Sarah Johnson', 'Michael Chen', 'Lisa Patel', 'James Wilson', 'Emma Garcia'];
-        const statuses = ['scheduled', 'completed', 'scheduled'];
-        const now = new Date();
-        return names.map((name, i) => ({
-            id: `demo-apt-${i}`,
-            patient_name: name,
-            scheduled_at: new Date(now.getTime() + (i - 1) * 3600000).toISOString(),
-            duration_minutes: 30,
-            status: statuses[i % statuses.length],
-            notes: ''
-        }));
-    }
+  function renderAppointmentCard(apt) {
+    const time = new Date(apt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const statusClass = apt.status === 'completed' ? 'completed' : apt.status === 'cancelled' ? 'cancelled' : 'scheduled';
 
-    function renderAppointments() {
-        const today = new Date().toDateString();
-
-        const todayList = appointments.filter(a =>
-            new Date(a.scheduled_at).toDateString() === today
-        );
-        const upcoming = appointments.filter(a =>
-            new Date(a.scheduled_at).toDateString() !== today &&
-            new Date(a.scheduled_at) > new Date()
-        );
-
-        const todayEl = document.getElementById('todayAppointments');
-        const upcomingEl = document.getElementById('upcomingAppointments');
-
-        if (todayEl) {
-            todayEl.innerHTML = todayList.length === 0
-                ? '<p class="empty-text">No appointments today.</p>'
-                : todayList.map(renderAppointmentCard).join('');
-        }
-
-        if (upcomingEl) {
-            upcomingEl.innerHTML = upcoming.length === 0
-                ? '<p class="empty-text">No upcoming appointments.</p>'
-                : upcoming.map(renderAppointmentCard).join('');
-        }
-    }
-
-    function renderAppointmentCard(apt) {
-        const time = new Date(apt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const statusClass = apt.status === 'completed' ? 'completed' : apt.status === 'cancelled' ? 'cancelled' : 'scheduled';
-
-        return `
+    return `
           <div class="appointment-card glass-panel ${statusClass}">
             <div class="apt-time">
               <span class="apt-hour">${time}</span>
@@ -116,29 +116,33 @@ const Appointments = (() => {
             </div>
           </div>
         `;
-    }
+  }
 
-    function openScheduleModal() {
-        UI.showToast('Appointment scheduling — select a patient from My Patients first.', 'info');
-    }
+  function openScheduleModal() {
+    UI.showToast('Appointment scheduling — select a patient from My Patients first.', 'info');
+  }
 
-    async function reschedule(id) {
-        UI.showToast('Reschedule functionality — select new date/time.', 'info');
-    }
+  async function reschedule(id) {
+    UI.showToast('Reschedule functionality — select new date/time.', 'info');
+  }
 
-    async function cancel(id) {
-        UI.confirmAction('Cancel Appointment', 'Are you sure you want to cancel this appointment?', async () => {
-            if (AppState.isDemoMode) {
-                UI.showToast('Demo Mode: Cancellation simulated.', 'info');
-                return;
-            }
-            const { success } = await API.updateAppointment(id, { status: 'cancelled' });
-            if (success) {
-                UI.showToast('Appointment cancelled.', 'success');
-                await fetchAppointments();
-            }
-        });
-    }
+  async function cancel(id) {
+    UI.confirmAction('Cancel Appointment', 'Are you sure you want to cancel this appointment?', async () => {
+      if (AppState.isDemoMode) {
+        UI.showToast('Demo Mode: Cancellation simulated.', 'info');
+        return;
+      }
+      const { success } = await API.updateAppointment(id, { status: 'cancelled' });
+      if (success) {
+        UI.showToast('Appointment cancelled.', 'success');
+        await fetchAppointments();
+      }
+    });
+  }
 
-    return { load, openScheduleModal, reschedule, cancel };
+  return { load, openScheduleModal, reschedule, cancel };
 })();
+
+// Register globally
+window.Appointments = Appointments;
+

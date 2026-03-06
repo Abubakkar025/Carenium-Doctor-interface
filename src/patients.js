@@ -17,6 +17,7 @@ const Patients = (() => {
             allPatients = data || [];
             renderGrid();
             updateDashboardStats();
+            setupRealtime(); // Phase 8: Real-time
          } else {
             console.error('Patients load failed:', message);
             const grid = document.getElementById('patientGrid');
@@ -26,6 +27,24 @@ const Patients = (() => {
          console.error('Patients critical error:', err);
       }
    }
+
+   let isRealtimeSetup = false;
+   function setupRealtime() {
+      if (isRealtimeSetup || window.isDemoMode) return;
+
+      const sb = window.supabaseClient;
+      if (!sb) return;
+
+      sb.channel('patients-live')
+         .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, payload => {
+            console.log('Real-time update received:', payload);
+            load(); // Refresh list
+         })
+         .subscribe();
+
+      isRealtimeSetup = true;
+   }
+
 
    function renderGrid() {
       const grid = document.getElementById('patientGrid');
@@ -317,7 +336,51 @@ const Patients = (() => {
       if (appointEl) appointEl.textContent = Math.floor(Math.random() * 8) + 2; // Placeholder
    }
 
+   async function admitPatient(e) {
+      if (e) e.preventDefault();
+
+      const btn = document.querySelector('#admissionForm button[type="submit"]');
+      if (btn) btn.disabled = true;
+
+      const patientData = {
+         name: document.getElementById('admName').value,
+         age: parseInt(document.getElementById('admAge').value),
+         gender: document.getElementById('admGender').value,
+         blood_group: document.getElementById('admBlood').value,
+         phone: document.getElementById('admPhone').value,
+         emergency_contact: document.getElementById('admEmergency').value,
+         department: document.getElementById('admDept').value,
+         ward: document.getElementById('admWard').value,
+         address: document.getElementById('admAddress').value,
+         condition: document.getElementById('admCondition').value,
+         assigned_doctor: AppState.user.id,
+         status: 'admitted',
+         created_at: new Date().toISOString()
+      };
+
+      try {
+         const { success, message } = await API.addPatient(patientData);
+         if (success) {
+            UI.showToast('Patient admitted successfully', 'success');
+            UI.closeModal('admissionModal');
+            document.getElementById('admissionForm').reset();
+            load(); // Re-fetch
+         } else {
+            UI.showToast(message || 'Failed to admit patient', 'error');
+         }
+      } catch (err) {
+         UI.showToast('Critical error during admission', 'error');
+      } finally {
+         if (btn) btn.disabled = false;
+      }
+   }
+
    function getAll() { return allPatients; }
 
-   return { load, openDetailModal, handleSave, switchDetailTab, getAll };
+   return { load, openDetailModal, handleSave, switchDetailTab, admitPatient, getAll };
 })();
+
+
+// Register globally
+window.Patients = Patients;
+

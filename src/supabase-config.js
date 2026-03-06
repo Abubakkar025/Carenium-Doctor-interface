@@ -1,37 +1,29 @@
 /* =============================================
-   CARENIUM — Safe Supabase Configuration
+   CARENIUM — Supabase Configuration
+   Must be imported FIRST before all other modules.
    ============================================= */
 
-(function () {
-   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-   // Global Registry
-   window.supabaseClient = null;
+// Initialize global reference
+window.supabaseClient = null;
 
-   // 1. Validate Config
-   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      console.error("Missing Supabase environment variables.");
-   }
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+   console.error('Carenium: Missing Supabase environment variables.');
+}
 
-   // 2. Check CDN Availability
-   if (!window.supabase) {
-      console.error('Carenium: Supabase library (CDN) failed to load.');
-      return;
-   }
-
-   // 3. Initialize with Safety
+// The CDN script loads synchronously before this module runs,
+// so window.supabase should be available.
+if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
    try {
       const { createClient } = window.supabase;
-      const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      if (client) {
-         window.supabaseClient = client;
-         console.log('Carenium: Database initialized successfully.');
-      } else {
-         throw new Error('createClient returned null');
-      }
+      window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log("Supabase initialized");
+      console.log('Carenium: Supabase client initialized successfully.');
    } catch (err) {
-      console.error('Carenium: Critical initialization error:', err.message);
+      console.error('Carenium: Supabase init error:', err.message);
    }
-})();
+} else if (!window.supabase) {
+   console.error('Carenium: Supabase CDN library not loaded.');
+}

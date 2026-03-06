@@ -5,9 +5,9 @@
 
 const DoctorActions = (() => {
 
-    function openDiagnosisForm(patientId) {
-        const modalBody = document.querySelector('#patientModal .modal-body');
-        modalBody.innerHTML = `
+  function openDiagnosisForm(patientId) {
+    const modalBody = document.querySelector('#patientModal .modal-body');
+    modalBody.innerHTML = `
           <div class="action-form p-6 fade-in">
             <h3 class="action-title">Add Diagnosis</h3>
             <div class="form-group mb-4">
@@ -30,44 +30,44 @@ const DoctorActions = (() => {
           </div>
         `;
 
-        const saveBtn = document.getElementById('addPatientBtn');
-        saveBtn.textContent = 'Save Diagnosis';
-        saveBtn.onclick = () => saveDiagnosis(patientId);
+    const saveBtn = document.getElementById('addPatientBtn');
+    saveBtn.textContent = 'Save Diagnosis';
+    saveBtn.onclick = () => saveDiagnosis(patientId);
+  }
+
+  async function saveDiagnosis(patientId) {
+    const diagnosis = document.getElementById('diagnosisText').value;
+    const severity = document.getElementById('diagnosisSeverity').value;
+    const notes = document.getElementById('diagnosisNotes').value;
+
+    if (!diagnosis.trim()) {
+      UI.showToast('Diagnosis text is required.', 'error');
+      return;
     }
 
-    async function saveDiagnosis(patientId) {
-        const diagnosis = document.getElementById('diagnosisText').value;
-        const severity = document.getElementById('diagnosisSeverity').value;
-        const notes = document.getElementById('diagnosisNotes').value;
+    const data = {
+      patient_id: patientId,
+      doctor_id: AppState.user.id,
+      diagnosis, severity, notes
+    };
 
-        if (!diagnosis.trim()) {
-            UI.showToast('Diagnosis text is required.', 'error');
-            return;
-        }
-
-        const data = {
-            patient_id: patientId,
-            doctor_id: AppState.user.id,
-            diagnosis, severity, notes
-        };
-
-        const { success } = await API.addDiagnosis(data);
-        if (success) {
-            UI.showToast('Diagnosis recorded successfully.', 'success');
-            UI.closeModal('patientModal');
-            await API.logAction({
-                action_type: 'DIAGNOSIS_ADDED',
-                user_id: AppState.user.id,
-                entity: 'diagnoses',
-                entity_id: patientId,
-                new_data: data
-            });
-        }
+    const { success } = await API.addDiagnosis(data);
+    if (success) {
+      UI.showToast('Diagnosis recorded successfully.', 'success');
+      UI.closeModal('patientModal');
+      await API.logAction({
+        action_type: 'DIAGNOSIS_ADDED',
+        user_id: AppState.user.id,
+        entity: 'diagnoses',
+        entity_id: patientId,
+        new_data: data
+      });
     }
+  }
 
-    function openPrescriptionForm(patientId) {
-        const modalBody = document.querySelector('#patientModal .modal-body');
-        modalBody.innerHTML = `
+  function openPrescriptionForm(patientId) {
+    const modalBody = document.querySelector('#patientModal .modal-body');
+    modalBody.innerHTML = `
           <div class="action-form p-6 fade-in">
             <h3 class="action-title">Add Prescription</h3>
             <div class="form-group mb-4">
@@ -104,46 +104,46 @@ const DoctorActions = (() => {
           </div>
         `;
 
-        const saveBtn = document.getElementById('addPatientBtn');
-        saveBtn.textContent = 'Save Prescription';
-        saveBtn.onclick = () => savePrescription(patientId);
+    const saveBtn = document.getElementById('addPatientBtn');
+    saveBtn.textContent = 'Save Prescription';
+    saveBtn.onclick = () => savePrescription(patientId);
+  }
+
+  async function savePrescription(patientId) {
+    const medication = document.getElementById('rxMedication').value;
+    const dosage = document.getElementById('rxDosage').value;
+    const frequency = document.getElementById('rxFrequency').value;
+    const duration = document.getElementById('rxDuration').value;
+    const notes = document.getElementById('rxNotes').value;
+
+    if (!medication.trim() || !dosage.trim()) {
+      UI.showToast('Medication and dosage are required.', 'error');
+      return;
     }
 
-    async function savePrescription(patientId) {
-        const medication = document.getElementById('rxMedication').value;
-        const dosage = document.getElementById('rxDosage').value;
-        const frequency = document.getElementById('rxFrequency').value;
-        const duration = document.getElementById('rxDuration').value;
-        const notes = document.getElementById('rxNotes').value;
+    const data = {
+      patient_id: patientId,
+      doctor_id: AppState.user.id,
+      medication, dosage, frequency, duration, notes
+    };
 
-        if (!medication.trim() || !dosage.trim()) {
-            UI.showToast('Medication and dosage are required.', 'error');
-            return;
-        }
-
-        const data = {
-            patient_id: patientId,
-            doctor_id: AppState.user.id,
-            medication, dosage, frequency, duration, notes
-        };
-
-        const { success } = await API.addPrescription(data);
-        if (success) {
-            UI.showToast('Prescription saved successfully.', 'success');
-            UI.closeModal('patientModal');
-            await API.logAction({
-                action_type: 'PRESCRIPTION_CREATED',
-                user_id: AppState.user.id,
-                entity: 'prescriptions',
-                entity_id: patientId,
-                new_data: data
-            });
-        }
+    const { success } = await API.addPrescription(data);
+    if (success) {
+      UI.showToast('Prescription saved successfully.', 'success');
+      UI.closeModal('patientModal');
+      await API.logAction({
+        action_type: 'PRESCRIPTION_CREATED',
+        user_id: AppState.user.id,
+        entity: 'prescriptions',
+        entity_id: patientId,
+        new_data: data
+      });
     }
+  }
 
-    function openLabRequestForm(patientId) {
-        const modalBody = document.querySelector('#patientModal .modal-body');
-        modalBody.innerHTML = `
+  function openLabRequestForm(patientId) {
+    const modalBody = document.querySelector('#patientModal .modal-body');
+    modalBody.innerHTML = `
           <div class="action-form p-6 fade-in">
             <h3 class="action-title">Request Lab Test</h3>
             <div class="form-group mb-4">
@@ -161,37 +161,37 @@ const DoctorActions = (() => {
           </div>
         `;
 
-        const saveBtn = document.getElementById('addPatientBtn');
-        saveBtn.textContent = 'Submit Lab Request';
-        saveBtn.onclick = () => saveLabRequest(patientId);
+    const saveBtn = document.getElementById('addPatientBtn');
+    saveBtn.textContent = 'Submit Lab Request';
+    saveBtn.onclick = () => saveLabRequest(patientId);
+  }
+
+  async function saveLabRequest(patientId) {
+    const testName = document.getElementById('labTestName').value;
+    const urgency = document.getElementById('labUrgency').value;
+
+    if (!testName.trim()) {
+      UI.showToast('Test name is required.', 'error');
+      return;
     }
 
-    async function saveLabRequest(patientId) {
-        const testName = document.getElementById('labTestName').value;
-        const urgency = document.getElementById('labUrgency').value;
+    const data = {
+      patient_id: patientId,
+      doctor_id: AppState.user.id,
+      test_name: testName,
+      urgency
+    };
 
-        if (!testName.trim()) {
-            UI.showToast('Test name is required.', 'error');
-            return;
-        }
-
-        const data = {
-            patient_id: patientId,
-            doctor_id: AppState.user.id,
-            test_name: testName,
-            urgency
-        };
-
-        const { success } = await API.requestLabTest(data);
-        if (success) {
-            UI.showToast('Lab test requested.', 'success');
-            UI.closeModal('patientModal');
-        }
+    const { success } = await API.requestLabTest(data);
+    if (success) {
+      UI.showToast('Lab test requested.', 'success');
+      UI.closeModal('patientModal');
     }
+  }
 
-    function openTreatmentPlanForm(patientId) {
-        const modalBody = document.querySelector('#patientModal .modal-body');
-        modalBody.innerHTML = `
+  function openTreatmentPlanForm(patientId) {
+    const modalBody = document.querySelector('#patientModal .modal-body');
+    modalBody.innerHTML = `
           <div class="action-form p-6 fade-in">
             <h3 class="action-title">Create Treatment Plan</h3>
             <div class="form-group mb-4">
@@ -205,61 +205,65 @@ const DoctorActions = (() => {
           </div>
         `;
 
-        const saveBtn = document.getElementById('addPatientBtn');
-        saveBtn.textContent = 'Save Treatment Plan';
-        saveBtn.onclick = () => saveTreatmentPlan(patientId);
+    const saveBtn = document.getElementById('addPatientBtn');
+    saveBtn.textContent = 'Save Treatment Plan';
+    saveBtn.onclick = () => saveTreatmentPlan(patientId);
+  }
+
+  async function saveTreatmentPlan(patientId) {
+    const title = document.getElementById('txTitle').value;
+    const description = document.getElementById('txDescription').value;
+
+    if (!title.trim() || !description.trim()) {
+      UI.showToast('Title and description are required.', 'error');
+      return;
     }
 
-    async function saveTreatmentPlan(patientId) {
-        const title = document.getElementById('txTitle').value;
-        const description = document.getElementById('txDescription').value;
-
-        if (!title.trim() || !description.trim()) {
-            UI.showToast('Title and description are required.', 'error');
-            return;
-        }
-
-        const data = {
-            patient_id: patientId,
-            doctor_id: AppState.user.id,
-            title, description
-        };
-
-        if (AppState.isDemoMode) {
-            UI.showToast('Demo Mode: Treatment plan simulated.', 'info');
-            UI.closeModal('patientModal');
-            return;
-        }
-
-        const { success } = await API.createTreatmentPlan(data);
-        if (success) {
-            UI.showToast('Treatment plan created.', 'success');
-            UI.closeModal('patientModal');
-        }
-    }
-
-    async function markCritical(patientId) {
-        UI.confirmAction('Mark as Critical', 'This will escalate the patient to critical status and trigger alerts. Continue?', async () => {
-            const { success } = await API.updatePatient(patientId, { status: 'critical' });
-            if (success) {
-                UI.showToast('Patient marked as CRITICAL. Alerts dispatched.', 'success');
-                Patients.load();
-                await API.logAction({
-                    action_type: 'MARK_CRITICAL',
-                    user_id: AppState.user.id,
-                    entity: 'patients',
-                    entity_id: patientId,
-                    new_data: { status: 'critical' }
-                });
-            }
-        });
-    }
-
-    return {
-        openDiagnosisForm,
-        openPrescriptionForm,
-        openLabRequestForm,
-        openTreatmentPlanForm,
-        markCritical
+    const data = {
+      patient_id: patientId,
+      doctor_id: AppState.user.id,
+      title, description
     };
+
+    if (AppState.isDemoMode) {
+      UI.showToast('Demo Mode: Treatment plan simulated.', 'info');
+      UI.closeModal('patientModal');
+      return;
+    }
+
+    const { success } = await API.createTreatmentPlan(data);
+    if (success) {
+      UI.showToast('Treatment plan created.', 'success');
+      UI.closeModal('patientModal');
+    }
+  }
+
+  async function markCritical(patientId) {
+    UI.confirmAction('Mark as Critical', 'This will escalate the patient to critical status and trigger alerts. Continue?', async () => {
+      const { success } = await API.updatePatient(patientId, { status: 'critical' });
+      if (success) {
+        UI.showToast('Patient marked as CRITICAL. Alerts dispatched.', 'success');
+        Patients.load();
+        await API.logAction({
+          action_type: 'MARK_CRITICAL',
+          user_id: AppState.user.id,
+          entity: 'patients',
+          entity_id: patientId,
+          new_data: { status: 'critical' }
+        });
+      }
+    });
+  }
+
+  return {
+    openDiagnosisForm,
+    openPrescriptionForm,
+    openLabRequestForm,
+    openTreatmentPlanForm,
+    markCritical
+  };
 })();
+
+// Register globally
+window.DoctorActions = DoctorActions;
+

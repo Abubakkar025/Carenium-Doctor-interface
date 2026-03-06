@@ -235,3 +235,7 @@ const Profile = (() => {
 
    return { load, toggleEdit, handleSave, toggleStatus, requestSpecChange };
 })();
+
+// Register globally
+window.Profile = Profile;
+

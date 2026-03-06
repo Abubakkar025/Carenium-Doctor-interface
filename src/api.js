@@ -5,13 +5,14 @@
    ============================================= */
 
 const API = (() => {
-    const supabase = window.supabaseClient;
+    // Lazy getter — ensures supabase is initialized before use
+    function sb() { return window.supabaseClient; }
+
     const CONFIG = {
         apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
         aiWsUrl: import.meta.env.VITE_AI_WS_URL || 'ws://localhost:8000/vitals'
     };
 
-    // Utility to handle responses uniformly with hardening
     async function request(promise, errorMessage = 'Database operation failed', context = 'API') {
         try {
             const { data, error } = await promise;
@@ -25,7 +26,6 @@ const API = (() => {
                 UI.showToast(message, 'error');
             }
 
-            // Log to audit if it's a security/critical failure
             if (context === 'Security' || context === 'Auth') {
                 API.logAction({
                     action: 'api_failure',
@@ -33,7 +33,6 @@ const API = (() => {
                 }).catch(() => { });
             }
 
-            // Handle JWT/Auth failures (Phase 6 Integration)
             if (err.status === 401 || err.code === 'PGRST301' || err.message?.includes('JWT')) {
                 console.warn('Carenium API: Session expired or invalid JWT. Redirecting...');
                 if (typeof Auth !== 'undefined') Auth.signOut();
@@ -53,15 +52,13 @@ const API = (() => {
         async getBaseProfile(userId) {
             if (window.isDemoMode) return { data: { name: 'Demo Doctor', role: 'doctor' }, success: true };
 
-            // 1. Try public users/profiles table first
-            const { data, error } = await supabase.from('users').select('name, role').eq('id', userId).maybeSingle();
+            const { data, error } = await sb().from('users').select('name, role').eq('id', userId).maybeSingle();
 
             if (!error && data) {
                 return { data, success: true };
             }
 
-            // 2. Fallback to Auth Metadata (Phase 5 Hardening)
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            const { data: { user }, error: authError } = await sb().auth.getUser();
             if (!authError && user && user.user_metadata) {
                 console.info('Carenium API: Using auth metadata fallback for profile.');
                 return {
@@ -92,7 +89,7 @@ const API = (() => {
             }
             const table = role === 'doctor' ? 'doctors' : 'nurses';
             return request(
-                supabase.from(table).select('*').eq('id', userId).maybeSingle(),
+                sb().from(table).select('*').eq('id', userId).maybeSingle(),
                 `Failed to fetch ${role} profile`
             );
         },
@@ -104,15 +101,15 @@ const API = (() => {
             }
             const table = role === 'doctor' ? 'doctors' : 'nurses';
             return request(
-                supabase.from(table).update(updates).eq('id', userId),
+                sb().from(table).update(updates).eq('id', userId),
                 'Failed to update medical profile'
             );
         },
 
         async getAllStaff() {
             if (window.isDemoMode) return { data: DemoData?.getStaff?.() || [], success: true };
-            const doctorsPromise = supabase.from('doctors').select('id, full_name, department, status, specialization');
-            const nursesPromise = supabase.from('nurses').select('id, full_name, department, status');
+            const doctorsPromise = sb().from('doctors').select('id, full_name, department, status, specialization');
+            const nursesPromise = sb().from('nurses').select('id, full_name, department, status');
 
             const [doctors, nurses] = await Promise.all([doctorsPromise, nursesPromise]);
 
@@ -144,7 +141,7 @@ const API = (() => {
                 };
             }
             return request(
-                supabase.from('doctor_profiles').select('*').eq('user_id', userId).maybeSingle(),
+                sb().from('doctor_profiles').select('*').eq('user_id', userId).maybeSingle(),
                 'Failed to fetch doctor profile'
             );
         },
@@ -155,7 +152,7 @@ const API = (() => {
                 return { data: profileData, success: true };
             }
             return request(
-                supabase.from('doctor_profiles').insert([profileData]).select().single(),
+                sb().from('doctor_profiles').insert([profileData]).select().single(),
                 'Failed to save doctor profile'
             );
         },
@@ -166,7 +163,7 @@ const API = (() => {
                 return { data: updates, success: true };
             }
             return request(
-                supabase.from('doctor_profiles').update(updates).eq('user_id', userId),
+                sb().from('doctor_profiles').update(updates).eq('user_id', userId),
                 'Failed to update doctor profile'
             );
         },
@@ -174,7 +171,7 @@ const API = (() => {
         // ── Patients ──
         async getPatients(role, userId) {
             if (window.isDemoMode) return { data: DemoData?.getPatients?.() || [], success: true };
-            let query = supabase.from('patients').select('*');
+            let query = sb().from('patients').select('*');
             if (role === 'doctor') {
                 query = query.eq('assigned_doctor', userId);
             } else if (role === 'nurse') {
@@ -189,7 +186,7 @@ const API = (() => {
                 return { data: patientData, success: true };
             }
             return request(
-                supabase.from('patients').insert([patientData]),
+                sb().from('patients').insert([patientData]),
                 'Failed to register patient'
             );
         },
@@ -200,7 +197,7 @@ const API = (() => {
                 return { data: updates, success: true };
             }
             return request(
-                supabase.from('patients').update(updates).eq('id', patientId),
+                sb().from('patients').update(updates).eq('id', patientId),
                 'Failed to update patient record'
             );
         },
@@ -209,7 +206,7 @@ const API = (() => {
         async getAppointments(doctorId) {
             if (window.isDemoMode) return { data: [], success: true };
             return request(
-                supabase.from('appointments').select('*').eq('doctor_id', doctorId).order('scheduled_at', { ascending: true }),
+                sb().from('appointments').select('*').eq('doctor_id', doctorId).order('scheduled_at', { ascending: true }),
                 'Failed to load appointments'
             );
         },
@@ -220,7 +217,7 @@ const API = (() => {
                 return { data, success: true };
             }
             return request(
-                supabase.from('appointments').insert([data]).select().single(),
+                sb().from('appointments').insert([data]).select().single(),
                 'Failed to create appointment'
             );
         },
@@ -231,7 +228,7 @@ const API = (() => {
                 return { data: updates, success: true };
             }
             return request(
-                supabase.from('appointments').update(updates).eq('id', id),
+                sb().from('appointments').update(updates).eq('id', id),
                 'Failed to update appointment'
             );
         },
@@ -243,7 +240,7 @@ const API = (() => {
                 return { data, success: true };
             }
             return request(
-                supabase.from('diagnoses').insert([data]).select().single(),
+                sb().from('diagnoses').insert([data]).select().single(),
                 'Failed to add diagnosis'
             );
         },
@@ -255,7 +252,7 @@ const API = (() => {
                 return { data, success: true };
             }
             return request(
-                supabase.from('prescriptions').insert([data]).select().single(),
+                sb().from('prescriptions').insert([data]).select().single(),
                 'Failed to add prescription'
             );
         },
@@ -267,7 +264,7 @@ const API = (() => {
                 return { data, success: true };
             }
             return request(
-                supabase.from('lab_requests').insert([data]).select().single(),
+                sb().from('lab_requests').insert([data]).select().single(),
                 'Failed to submit lab request'
             );
         },
@@ -279,7 +276,7 @@ const API = (() => {
                 return { data, success: true };
             }
             return request(
-                supabase.from('treatment_plans').insert([data]).select().single(),
+                sb().from('treatment_plans').insert([data]).select().single(),
                 'Failed to create treatment plan'
             );
         },
@@ -288,9 +285,12 @@ const API = (() => {
         async logAction(actionData) {
             if (window.isDemoMode) return { success: true };
             return request(
-                supabase.from('audit_logs').insert([actionData]),
+                sb().from('audit_logs').insert([actionData]),
                 'Failed to log audit action'
             );
         }
     };
 })();
+
+// Register globally
+window.API = API;

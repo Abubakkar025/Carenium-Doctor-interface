@@ -1,10 +1,10 @@
-/* =============================================
+   /* =============================================
    CARENIUM — Real-time Engine
    Single channel communication hub.
    ============================================= */
 
 const Realtime = (() => {
-    const supabase = window.supabaseClient;
+    function sb() { return window.supabaseClient; }
     const CONFIG = {
         aiWsUrl: import.meta.env.VITE_AI_WS_URL || 'ws://localhost:8000/vitals'
     };
@@ -12,9 +12,9 @@ const Realtime = (() => {
 
     function init(onUpdate) {
         if (window.isDemoMode) return;
-        if (!supabase) return;
+        if (!sb()) return;
 
-        channel = supabase.channel('hospital-live')
+        channel = sb().channel('hospital-live')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'patients' }, (payload) => {
                 onUpdate('patients', payload);
             })
@@ -41,3 +41,6 @@ const Realtime = (() => {
 
     return { init, stop };
 })();
+
+// Register globally
+window.Realtime = Realtime;

@@ -7,13 +7,13 @@ const Staff = (() => {
   let directory = [];
 
   async function load() {
-    const gridId = activeSection === 'directory' ? 'staffGrid' : null;
+    const gridId = AppState.activeSection === 'directory' ? 'staffGrid' : null;
     if (gridId) UI.renderSkeletonGrid(gridId, 4);
 
     const { data, success } = await API.getAllStaff();
     if (success) {
       directory = data;
-      if (activeSection === 'directory') renderDirectory();
+      if (AppState.activeSection === 'directory') renderDirectory();
     }
   }
 
@@ -38,3 +38,6 @@ const Staff = (() => {
 
   return { load, getDirectory: () => directory };
 })();
+
+// Register globally
+window.Staff = Staff;

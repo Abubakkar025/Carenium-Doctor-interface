@@ -18,17 +18,16 @@ const UI = (() => {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type} glass-card`;
 
-        // Lucide icon mapping
         const icons = {
-            success: 'check-circle',
-            error: 'alert-circle',
-            warning: 'alert-triangle',
-            info: 'info'
+            success: '✓',
+            error: '✕',
+            warning: '⚠',
+            info: 'ℹ'
         };
 
         toast.innerHTML = `
             <div class="toast-content flex items-center gap-3">
-                <span class="toast-icon"><i data-lucide="${icons[type] || 'info'}"></i></span>
+                <span class="toast-icon">${icons[type] || 'ℹ'}</span>
                 <span class="toast-message">${message}</span>
             </div>
             <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>
@@ -86,6 +85,46 @@ const UI = (() => {
     }
 
     /**
+     * Confirm Action Dialog
+     */
+    function confirmAction(title, message, onConfirm) {
+        const existing = document.getElementById('confirmDialog');
+        if (existing) existing.remove();
+
+        const dialog = document.createElement('div');
+        dialog.id = 'confirmDialog';
+        dialog.className = 'modal-overlay';
+        dialog.style.display = 'flex';
+        dialog.innerHTML = `
+            <div class="modal-content glass-card" style="max-width: 420px; padding: 32px; border-radius: 24px; text-align: center;">
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 12px;">${title}</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">${message}</p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button class="btn btn-secondary" id="confirmCancel" style="padding: 10px 24px; border-radius: 12px;">Cancel</button>
+                    <button class="btn btn-primary" id="confirmOk" style="padding: 10px 24px; border-radius: 12px; background: var(--gradient-uranus, linear-gradient(135deg, #0a8fd4, #005f99)); color: #fff; font-weight: 700;">Confirm</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+
+        document.getElementById('confirmCancel').onclick = () => dialog.remove();
+        document.getElementById('confirmOk').onclick = async () => {
+            dialog.remove();
+            if (onConfirm) await onConfirm();
+        };
+    }
+
+    /**
+     * Toggle Panel visibility
+     */
+    function togglePanel(panelId) {
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        const isVisible = panel.style.display !== 'none';
+        panel.style.display = isVisible ? 'none' : 'block';
+    }
+
+    /**
      * Skeleton Loading Indicators (GPU Optimized)
      */
     function setSkeleton(containerId, count = 3, type = 'card') {
@@ -110,7 +149,7 @@ const UI = (() => {
     }
 
     /**
-     * Lucide Icon Engine Integration
+     * Icon Engine Integration
      */
     function initIcons() {
         if (typeof lucide !== 'undefined') {
@@ -122,8 +161,13 @@ const UI = (() => {
         showToast,
         openModal,
         closeModal,
+        confirmAction,
+        togglePanel,
         setSkeleton,
         renderSkeletonGrid,
         initIcons
     };
 })();
+
+// Register globally
+window.UI = UI;

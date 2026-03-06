@@ -67,4 +67,8 @@ const ThemeManager = (() => {
     return { init, toggle, apply, setSpecificTheme, getPreferred };
 })();
 
+// Register globally
+window.ThemeManager = ThemeManager;
+
 document.addEventListener('DOMContentLoaded', ThemeManager.init);
+
