@@ -1,0 +1,380 @@
+/* =============================================
+   CARENIUM — Premium Enterprise SaaS Styles (v2)
+   ============================================= */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: var(--gradient-moon-animate);
+    background-size: 400% 400%;
+    animation: moon-gradient-flow 20s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes moon-gradient-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* ── Realistic Premium Card (Cosmic Glass) ── */
+.login-card {
+    width: 100%;
+    max-width: 460px;
+    padding: var(--space-10) var(--space-8);
+    position: relative;
+    z-index: 10;
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(112, 107, 103, 0.2);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.brand-title {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -1.5px;
+    margin: 0;
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(218, 210, 202, 0.3));
+}
+
+.brand-subtitle {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* ── Tab Switcher ── */
+.auth-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: var(--space-6);
+    position: relative;
+    border: 1px solid var(--border-light);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--text-tertiary);
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1;
+}
+
+.auth-tab svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.auth-tab.active {
+    color: #fff;
+}
+
+.auth-tab-indicator {
+    position: absolute;
+    height: calc(100% - 8px);
+    top: 4px;
+    background: var(--gradient-hero);
+    border-radius: 9px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-forms-container {
+    position: relative;
+    min-height: 380px;
+}
+
+.auth-panel {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-4);
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.auth-panel.active {
+    display: flex;
+}
+
+.brand svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--space-2);
+}
+
+/* ── Form Inputs ── */
+.login-input-group {
+    position: relative;
+    margin-bottom: var(--space-4);
+}
+
+.login-input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    color: #fff;
+    font-size: var(--font-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-input:focus {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--moon-accent);
+    box-shadow: 0 0 0 4px rgba(218, 210, 202, 0.15);
+}
+
+.login-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    transition: color 0.3s;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-input-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.login-input:focus+.login-input-icon {
+    color: var(--theme-accent);
+}
+
+/* ── Actions ── */
+.login-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, var(--moon-secondary), var(--moon-mid-gray));
+    color: #fff;
+    font-size: var(--font-md);
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 24px rgba(112, 107, 103, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: var(--space-2);
+}
+
+.login-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(112, 107, 103, 0.3);
+    filter: contrast(1.1);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.demo-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.demo-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--moon-accent);
+    color: var(--moon-primary);
+}
+
+.demo-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ── Signup Success ── */
+.signup-success {
+    text-align: center;
+    padding: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(218, 210, 202, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--moon-accent);
+    margin: 0 auto var(--space-4);
+    animation: successPop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.success-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+@keyframes successPop {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+}
+
+.success-text {
+    color: var(--text-tertiary);
+    font-size: var(--font-sm);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+}
+
+/* ── Footer ── */
+.login-footer {
+    text-align: center;
+    margin-top: var(--space-8);
+}
+
+.auth-switch {
+    font-size: var(--font-sm);
+    color: var(--text-tertiary);
+}
+
+.auth-switch a {
+    color: var(--theme-accent);
+    font-weight: 600;
+}
+
+.footer-security {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: var(--space-4);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.footer-security span {
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+/* ── Minimalist Moon Error Card ── */
+.error-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--moon-accent);
+    border-radius: 12px;
+    padding: var(--space-4);
+    color: var(--moon-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-4);
+    animation: shake 0.4s ease-in-out;
+}
+
+.error-icon {
+    color: var(--moon-accent);
+    font-size: 1.2rem;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* ── Mobile Optimization ── */
+@media (max-width: 480px) {
+    .login-card {
+        padding: var(--space-8) var(--space-5);
+        border: none;
+        background: transparent;
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+
+    .brand-title {
+        font-size: 2.25rem;
+    }
+}

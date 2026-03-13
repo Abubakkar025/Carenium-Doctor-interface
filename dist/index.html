@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description"
+    content="Carenium — Secure healthcare monitoring platform. Login to access real-time patient data and medical dashboards.">
+  <meta name="theme-color" content="#0a8fd4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Carenium — Login</title>
+
+  <!-- Performance Optimization: Resource Hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://josxtlkojdzcqbpsagpf.supabase.co">
+
+  <!-- Primary Stylesheet -->
+
+  <script type="module" crossorigin src="/assets/main-CqnVBWrA.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/router-CSEoaQfc.js">
+  <link rel="stylesheet" crossorigin href="/assets/router-InrGvv6A.css">
+</head>
+
+<body>
+  <div class="cosmic-bg">
+    <div class="radial-glow"></div>
+  </div>
+  <div id="systemError" class="system-error-overlay" style="display: none;">
+    <div class="error-card">
+      <div class="error-icon">⚠</div>
+      <h3>System Initialization Error</h3>
+      <p>Please contact system administrator or refresh page.</p>
+    </div>
+  </div>
+  <div class="login-wrapper">
+    <!-- Theme Toggle -->
+    <div class="login-theme-toggle">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="icon-sun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="login-card glass-card">
+      <div class="login-header">
+        <div class="brand">
+          <div class="logo-shield">
+            <svg viewBox="0 0 120 120" width="60" height="60">
+              <path d="M60 5 L110 30 V70 C110 95 85 115 60 115 C35 115 10 95 10 70 V30 Z" fill="#1dd1a1" />
+              <polyline points="30,65 45,65 52,50 62,85 72,60 90,60" stroke="#ffffff" stroke-width="6" fill="none"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h1 class="brand-title">Carenium</h1>
+          <p class="brand-subtitle">Health Intelligence Systems</p>
+        </div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" data-tab="signin" id="tabSignIn">Sign In</button>
+        <button class="auth-tab" data-tab="signup" id="tabSignUp">Create Account</button>
+        <div class="auth-tab-indicator" id="tabIndicator"></div>
+      </div>
+
+      <!-- Forms Area -->
+      <div class="auth-forms-container" id="authFormsContainer">
+        <!-- Sign In -->
+        <form class="auth-panel active" id="loginForm" novalidate>
+          <div class="login-input-group">
+            <input type="email" class="login-input" id="loginEmail" placeholder="Medical ID or Email" required>
+            <span class="login-input-icon">📩</span>
+          </div>
+          <div class="login-input-group">
+            <input type="password" class="login-input" id="loginPassword" placeholder="Access Password" required>
+            <span class="login-input-icon">🔒</span>
+          </div>
+          <button type="submit" class="login-btn" id="loginBtn">Authorize Access</button>
+        </form>
+
+        <!-- Sign Up -->
+        <form class="auth-panel" id="signupForm" novalidate style="display:none;">
+          <div class="login-input-group">
+            <input type="text" class="login-input" id="signupName" placeholder="Full Professional Name" required>
+            <span class="login-input-icon">👤</span>
+          </div>
+          <div class="login-input-group">
+            <input type="email" class="login-input" id="signupEmail" placeholder="Professional Email" required>
+            <span class="login-input-icon">📩</span>
+          </div>
+          <div class="login-input-group">
+            <select class="login-input login-select" id="signupRole" required>
+              <option value="" disabled selected>Medical Specialization</option>
+              <option value="doctor">Consultant / Doctor</option>
+              <option value="nurse">Nursing Staff</option>
+            </select>
+          </div>
+          <div class="login-input-group">
+            <input type="password" class="login-input" id="signupPassword" placeholder="Secure Password" required>
+            <span class="login-input-icon">🔒</span>
+          </div>
+          <button type="submit" class="login-btn" id="signupBtn">Register Provider</button>
+        </form>
+      </div>
+
+      <div class="login-footer">
+        <p class="auth-switch" id="authSwitch">
+          Already registered? <a href="#" id="switchToSignin">Sign In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Patient Modal -->
+  <div class="modal-overlay" id="patientModal" style="display:none;">
+    <div class="modal-content glass-card"
+      style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 0;">
+      <div class="modal-header"
+        style="display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.1));">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff;">Patient Record</h2>
+        <button class="modal-close" onclick="UI.closeModal('patientModal')"
+          style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 4px 8px;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px 32px;"></div>
+      <div class="modal-footer"
+        style="padding: 16px 32px; border-top: 1px solid var(--glass-border, rgba(255,255,255,0.1)); display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-secondary" onclick="UI.closeModal('patientModal')">Close</button>
+        <button class="btn btn-primary" id="addPatientBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hospital Admission Modal -->
+  <div class="modal-overlay admission-modal" id="admissionModal" style="display:none;">
+    <div class="modal-content glass-card" style="max-width: 800px; width: 95%; border-radius: 28px;">
+      <div class="admission-header">
+        <h2 style="font-size: 1.5rem; font-weight: 850; color: #fff;">New Patient Admission</h2>
+        <button class="modal-close" onclick="UI.closeModal('admissionModal')">&times;</button>
+      </div>
+      <form id="admissionForm">
+        <div class="admission-form">
+          <!-- Column 1 -->
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="admName" class="form-input" placeholder="e.g. John Doe" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Age</label>
+            <input type="number" id="admAge" class="form-input" placeholder="Years" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select id="admGender" class="form-input" required>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Blood Group</label>
+            <select id="admBlood" class="form-input">
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+          <!-- Column 2 -->
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" id="admPhone" class="form-input" placeholder="+1..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emergency Contact</label>
+            <input type="tel" id="admEmergency" class="form-input" placeholder="Name & Phone" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select id="admDept" class="form-input" required>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Neurology">Neurology</option>
+              <option value="Orthopedic">Orthopedic</option>
+              <option value="General Medicine">General Medicine</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ward / Room</label>
+            <input type="text" id="admWard" class="form-input" placeholder="Room 204 / Ward A" required>
+          </div>
+          <!-- Full Width -->
+          <div class="form-group full-width">
+            <label class="form-label">Address</label>
+            <input type="text" id="admAddress" class="form-input" placeholder="Full residential address">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Condition / Disease / Reason for Admission</label>
+            <textarea id="admCondition" class="form-input" style="height: 80px;"
+              placeholder="Describe symptoms or diagnosis..." required></textarea>
+          </div>
+        </div>
+        <div class="submission-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('admissionModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary"
+            style="background: var(--gradient-uranus); padding: 12px 32px;">Admit Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Clinical Scheduling Modal -->
+  <div class="modal-overlay appointment-modal" id="appointmentModal" style="display:none;">
+    <div class="modal-content glass-card" style="max-width: 500px; width: 90%; border-radius: 28px;">
+      <div class="modal-header p-6 border-b border-white/5">
+        <h2 style="font-size: 1.25rem; font-weight: 850; color: #fff;">Clinical Session Schedule</h2>
+        <button class="modal-close" onclick="UI.closeModal('appointmentModal')">&times;</button>
+      </div>
+      <div class="modal-body p-0"></div>
+    </div>
+  </div>
+
+  <!-- Digital Prescription Modal -->
+  <div class="modal-overlay prescription-modal" id="prescriptionModal" style="display:none;">
+    <div class="modal-content glass-card" style="max-width: 500px; width: 90%; border-radius: 28px;">
+      <div class="modal-header p-6 border-b border-white/5">
+        <h2 style="font-size: 1.25rem; font-weight: 850; color: #fff;">Digital Prescription Engine</h2>
+        <button class="modal-close" onclick="UI.closeModal('prescriptionModal')">&times;</button>
+      </div>
+      <div class="modal-body p-0"></div>
+    </div>
+  </div>
+
+  <!-- Professional Admission Slide Panel -->
+  <div id="admissionPanel" class="slide-panel glass-card">
+    <div class="panel-header p-6 border-b border-white/5 flex justify-between items-center">
+      <div>
+        <h2 class="text-xl font-black">Clinical Admission</h2>
+        <p class="text-[10px] opacity-40 uppercase tracking-widest font-bold">New Inpatient Protocol</p>
+      </div>
+      <button class="close-panel text-2xl opacity-50 hover:opacity-100" onclick="Dashboard.closeAdmission()">✕</button>
+    </div>
+    <div class="panel-body p-8 overflow-y-auto h-[calc(100%-80px)]">
+      <form id="slideAdmissionForm" class="flex flex-col gap-6">
+        <div class="form-group">
+          <label class="text-[10px] font-black opacity-30 uppercase">Full Legal Name</label>
+          <input type="text" id="slideAdmName" class="form-input" placeholder="e.g. Alexander Hamilton" required>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="text-[10px] font-black opacity-30 uppercase">Age</label>
+            <input type="number" id="slideAdmAge" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="text-[10px] font-black opacity-30 uppercase">Gender</label>
+            <select id="slideAdmGender" class="form-input">
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="text-[10px] font-black opacity-30 uppercase">Assigned Department</label>
+          <select id="slideAdmDept" class="form-input">
+            <option>Cardiology</option>
+            <option>Neurology</option>
+            <option>Oncology</option>
+            <option>Pediatrics</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="text-[10px] font-black opacity-30 uppercase">Clinical Condition / Disease</label>
+          <textarea id="slideAdmDisease" class="form-input h-20" required></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="text-[10px] font-black opacity-30 uppercase">Attending Doctor</label>
+            <input type="text" id="slideAdmDoctor" class="form-input" placeholder="MD Name">
+          </div>
+          <div class="form-group">
+            <label class="text-[10px] font-black opacity-30 uppercase">Room Number</label>
+            <input type="text" id="slideAdmRoom" class="form-input" placeholder="R-204">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="text-[10px] font-black opacity-30 uppercase">Emergency Contact</label>
+          <input type="tel" id="slideAdmEmergency" class="form-input" placeholder="Name & Phone">
+        </div>
+        <button type="submit" class="new-admission-btn w-full py-4 mt-4">Confirm Clinical Admission</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- App Scripts -->
+
+  <!-- Dynamic Island Demo Button -->
+  <button type="button" class="demo-access-btn" id="demoAccessBtn">
+    <span class="icon">✨</span>
+    Try Demo Dashboard
+  </button>
+</body>
+
+</html>

@@ -1,0 +1,311 @@
+/* =============================================
+   CARENIUM — Design Tokens & Theme System
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Primary Palette ── */
+  --primary-50: #e8f5fe;
+  --primary-100: #b8e2fc;
+  --primary-200: #88cffa;
+  --primary-300: #58bcf8;
+  --primary-400: #28a9f6;
+  --primary-500: #0a8fd4;
+  --primary-600: #0876b0;
+  --primary-700: #065d8c;
+  --primary-800: #044468;
+  --primary-900: #022b44;
+
+  /* ── Accent / Teal ── */
+  --accent-50: #e6fcf5;
+  --accent-100: #b2f5d8;
+  --accent-200: #7eeebb;
+  --accent-300: #4ae79e;
+  --accent-400: #20d482;
+  --accent-500: #12b76a;
+  --accent-600: #0e9255;
+  --accent-700: #0a6d40;
+  --accent-800: #06492b;
+  --accent-900: #032416;
+
+  /* ── Status Colors ── */
+  --status-stable: #12b76a;
+  --status-stable-bg: rgba(18, 183, 106, 0.12);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-critical: #ef4444;
+  --status-critical-bg: rgba(239, 68, 68, 0.12);
+
+  /* ── Typography ── */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-xs: 0.75rem;
+  --font-sm: 0.8125rem;
+  --font-base: 0.9375rem;
+  --font-md: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-2xl: 1.5rem;
+  --font-3xl: 1.875rem;
+  --font-4xl: 2.25rem;
+
+  /* ── Spacing ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Border Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+
+  /* ── Moon Palette (Elite) ── */
+  --moon-primary: #D3CEC8;
+  --moon-secondary: #867F79;
+  --moon-mid-gray: #706B67;
+  --moon-bg-soft: #CCC3BC;
+  --moon-accent: #DAD2CA;
+
+  /* ── Cosmic Gradient Themes ── */
+  --gradient-uranus: linear-gradient(135deg, #00609A, #00BCF0, #1FF4D0, #B0FAFF, #20A7B7);
+  --gradient-pluto: linear-gradient(135deg, #41201C, #BD4E36, #DFC1AC, #7D9790, #444754);
+  --gradient-moon: linear-gradient(135deg, var(--moon-primary), var(--moon-bg-soft), var(--moon-accent));
+  --gradient-moon-animate: linear-gradient(135deg, var(--moon-primary), var(--moon-bg-soft), var(--moon-accent), var(--moon-primary));
+  --gradient-black-hole: linear-gradient(135deg, #222A32, #7A8794, #747163, #525B64);
+  --gradient-saturn: linear-gradient(135deg, #2F2E27, #7F785E, #F7F4B7, #8C7C55, #37311E);
+
+  /* ── Cosmic UI Accents ── */
+  --neon-cyan: #1FF4D0;
+  --neon-glow-cyan: 0 0 15px rgba(31, 244, 208, 0.4);
+  --neon-glow-uranus: 0 0 20px rgba(0, 188, 240, 0.5);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Z-Index ── */
+  --z-dropdown: 100;
+  --z-sidebar: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+}
+
+/* =============================================
+   COSMIC DARK SYSTEM (Default Primary - URANUS)
+   ============================================= */
+[data-theme="uranus"],
+[data-theme="dark"],
+:root {
+  --bg-primary: #05070a;
+  --bg-secondary: #0b0e14;
+  --bg-tertiary: #11161d;
+  --bg-card: rgba(17, 22, 29, 0.7);
+  --bg-sidebar: rgba(5, 7, 10, 0.82);
+  --bg-input: rgba(255, 255, 255, 0.05);
+  --bg-hover: rgba(31, 244, 208, 0.08);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-inverse: #05070a;
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.04);
+
+  --gradient-hero: var(--gradient-uranus);
+  --gradient-card: linear-gradient(135deg, rgba(31, 244, 208, 0.05) 0%, rgba(0, 188, 240, 0.05) 100%);
+  --gradient-sidebar: linear-gradient(180deg, #0b0e14 0%, #05070a 100%);
+
+  --glass-bg: rgba(11, 14, 20, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  --scrollbar-track: #05070a;
+  --scrollbar-thumb: #1e293b;
+
+  --theme-accent: var(--neon-cyan);
+}
+
+/* =============================================
+   PLUTO — Alerts & Critical States
+   ============================================= */
+[data-theme="pluto"] {
+  --bg-primary: #0f0505;
+  --bg-secondary: #1a0b0b;
+  --bg-tertiary: #261111;
+  --bg-card: rgba(38, 17, 17, 0.7);
+  --bg-sidebar: rgba(15, 5, 5, 0.85);
+
+  --text-primary: #fee2e2;
+  --text-secondary: #fca5a5;
+  --text-tertiary: #ef4444;
+
+  --border-color: rgba(239, 68, 68, 0.15);
+  --gradient-hero: var(--gradient-pluto);
+  --theme-accent: #ef4444;
+}
+
+/* =============================================
+   MOON — Forms & Authentication
+   ============================================= */
+[data-theme="moon"] {
+  --bg-primary: var(--moon-mid-gray);
+  --bg-secondary: var(--moon-secondary);
+  --bg-tertiary: var(--moon-bg-soft);
+  --bg-card: rgba(255, 255, 255, 0.08);
+  --bg-sidebar: var(--moon-mid-gray);
+  --bg-input: rgba(255, 255, 255, 0.03);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+
+  --text-primary: var(--moon-primary);
+  --text-secondary: var(--moon-bg-soft);
+  --text-tertiary: var(--moon-secondary);
+
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-light: rgba(255, 255, 255, 0.06);
+
+  --gradient-hero: var(--gradient-moon);
+  --theme-accent: var(--moon-accent);
+
+  --glass-bg: rgba(112, 107, 103, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px rgba(112, 107, 103, 0.2);
+}
+
+/* =============================================
+   BLACK HOLE — Admin System Core
+   ============================================= */
+[data-theme="black-hole"] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
+  --bg-card: rgba(20, 20, 20, 0.9);
+
+  --text-primary: #ffffff;
+  --text-secondary: #71717a;
+
+  --border-color: rgba(255, 255, 255, 0.05);
+  --gradient-hero: var(--gradient-black-hole);
+  --theme-accent: #3f3f46;
+}
+
+/* =============================================
+   SATURN — Doctor Profiles & Performance
+   ============================================= */
+[data-theme="saturn"] {
+  --bg-primary: #0a0907;
+  --bg-secondary: #14120e;
+  --bg-tertiary: #1f1b15;
+  --bg-card: rgba(31, 27, 21, 0.75);
+
+  --text-primary: #fef3c7;
+  --text-secondary: #d97706;
+
+  --border-color: rgba(217, 119, 6, 0.1);
+  --gradient-hero: var(--gradient-saturn);
+  --theme-accent: #fbbf24;
+}
+
+/* =============================================
+   LIGHT THEME (Cosmic Minimal)
+   ============================================= */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-input: #f1f5f9;
+  --bg-hover: rgba(0, 96, 154, 0.06);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --text-inverse: #ffffff;
+
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  --gradient-hero: var(--gradient-uranus);
+  --gradient-card: linear-gradient(135deg, rgba(0, 188, 240, 0.05) 0%, rgba(31, 244, 208, 0.05) 100%);
+  --gradient-sidebar: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+/* =============================================
+   COSMIC ANIMATIONS
+   ============================================= */
+@keyframes cosmic-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes cosmic-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(31, 244, 208, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(31, 244, 208, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 244, 208, 0);
+  }
+}
+
+@keyframes cosmic-glow {
+  from {
+    filter: drop-shadow(0 0 2px var(--neon-cyan));
+  }
+
+  to {
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+  }
+}
+
+.animate-cosmic-flow {
+  background-size: 200% 200%;
+  animation: cosmic-flow 15s ease infinite;
+}
+
+.animate-cosmic-pulse {
+  animation: cosmic-pulse 2s infinite;
+}
+
+.animate-cosmic-glow {
+  animation: cosmic-glow 2s ease-in-out infinite alternate;
+}
