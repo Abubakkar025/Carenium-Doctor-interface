@@ -1,9 +1,0 @@
-{
-    "python.defaultInterpreterPath": "services/fastapi-ai/.venv/Scripts/python.exe",
-    "python.analysis.extraPaths": [
-        "services/fastapi-ai"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": false,
-    "python.testing.nosetestsEnabled": false
-}
