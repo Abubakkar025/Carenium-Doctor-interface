@@ -1,22 +1,15 @@
-/* =============================================
-   CARENIUM — Enterprise Auth Module (v2.1 Hardened)
-   ============================================= */
-
-// Global Demo Gate
-window.isDemoMode = sessionStorage.getItem('demoMode') === 'true';
+import { supabaseClient } from './supabase.js';
+import { Notifications } from '../ui/notifications.js';
 
 const Auth = (() => {
-    // Lazy getter — supabase is initialized by supabase-config.js before this runs
-    function sb() { return window.supabaseClient; }
+    function sb() { return supabaseClient; }
 
     /**
      * Centralized Error Logger & Handler
      */
     function handleError(error, context) {
         console.error(`Carenium Auth [${context}]:`, error);
-        if (window.UI && window.UI.showToast) {
-            window.UI.showToast(error.message || 'Authentication error', 'error');
-        }
+        Notifications.error(error.message || 'Authentication error');
         return { success: false, message: error.message || 'Operation failed' };
     }
 
@@ -31,17 +24,27 @@ const Auth = (() => {
         if (!checkSupabase()) return { success: false, message: 'System unreachable' };
 
         try {
-            sessionStorage.removeItem('demoMode');
+            console.log("Carenium Auth: Attempting login for", email);
+            sessionStorage.clear(); // Fresh start
             window.isDemoMode = false;
 
             const { data, error } = await sb().auth.signInWithPassword({ email, password });
             if (error) throw error;
+
+            console.log("Carenium Auth: Login successful.");
             return { success: true, user: data.user };
         } catch (error) {
             let message = error.message || 'Login failed';
-            if (message.toLowerCase().includes('invalid login')) {
-                message = 'Invalid credentials. Please verify your email and password.';
+            const lowMsg = message.toLowerCase();
+
+            if (lowMsg.includes('invalid login') || lowMsg.includes('credentials')) {
+                message = 'Invalid medical credentials. Please check your ID/Password.';
+            } else if (lowMsg.includes('email not confirmed')) {
+                message = 'Medical account not yet verified. Please check your email.';
+            } else if (lowMsg.includes('rate limit')) {
+                message = 'Too many attempts. Account locked for security. Try again later.';
             }
+
             return handleError({ message }, 'SignIn');
         }
     }
@@ -71,23 +74,16 @@ const Auth = (() => {
 
     async function signOut() {
         try {
-            if (window.isDemoMode) {
-                sessionStorage.removeItem('demoMode');
-                window.isDemoMode = false;
-                window.location.href = '/';
-                return;
-            }
-
             if (sb()) {
                 await sb().auth.signOut();
             }
 
             sessionStorage.clear();
             localStorage.removeItem('carenium-theme');
-            window.location.href = '/';
+            window.location.href = '/index.html';
         } catch (error) {
             console.error('SignOut error:', error);
-            window.location.href = '/';
+            window.location.href = '/index.html';
         }
     }
 
@@ -112,7 +108,8 @@ const Auth = (() => {
         try {
             const session = await getSession();
             if (session || window.isDemoMode) {
-                window.location.href = '/dashboard';
+                if (window.Router) window.Router.navigate('/dashboard');
+                else window.location.href = '/dashboard';
                 return true;
             }
         } catch (e) {
@@ -125,16 +122,19 @@ const Auth = (() => {
         try {
             const session = await getSession();
             if (!session && !window.isDemoMode) {
-                window.location.href = '/';
+                if (window.Router) window.Router.navigate('/');
+                else window.location.href = '/';
                 return true;
             }
         } catch (e) {
-            window.location.href = '/';
+            if (window.Router) window.Router.navigate('/');
+            else window.location.href = '/';
             return true;
         }
         return false;
     }
 
+    console.log("Carenium Auth: Module loaded.");
     return {
         signIn,
         signUp,
@@ -146,5 +146,6 @@ const Auth = (() => {
     };
 })();
 
-// Register globally so other modules and inline onclick handlers can access it
-window.Auth = Auth;
+export { Auth };
+window.Auth = Auth; // Legacy
+

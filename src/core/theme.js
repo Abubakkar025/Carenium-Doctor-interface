@@ -1,7 +1,3 @@
-/* =============================================
-   CARENIUM — Theme Toggle (Dark / Light)
-   ============================================= */
-
 const ThemeManager = (() => {
     const STORAGE_KEY = 'carenium-theme';
     const THEMES = ['uranus', 'pluto', 'moon', 'black-hole', 'saturn', 'light'];
@@ -9,7 +5,7 @@ const ThemeManager = (() => {
     function getPreferred() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved && THEMES.includes(saved)) return saved;
-        return 'moon'; // New Default: Moon Elite
+        return 'moon';
     }
 
     function apply(theme) {
@@ -45,7 +41,6 @@ const ThemeManager = (() => {
             }
         });
 
-        // Update body class for role-based animations if needed
         document.body.className = `theme-${theme} animate-cosmic-flow`;
     }
 
@@ -53,7 +48,6 @@ const ThemeManager = (() => {
         const theme = getPreferred();
         apply(theme);
 
-        // Bind toggle buttons
         document.querySelectorAll('.theme-toggle').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -67,8 +61,7 @@ const ThemeManager = (() => {
     return { init, toggle, apply, setSpecificTheme, getPreferred };
 })();
 
-// Register globally
-window.ThemeManager = ThemeManager;
+export { ThemeManager };
+window.ThemeManager = ThemeManager; // Legacy
 
-document.addEventListener('DOMContentLoaded', ThemeManager.init);
 
