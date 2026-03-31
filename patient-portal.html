@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Carenium — Patient Portal">
+  <meta name="theme-color" content="#10b981">
+  <title>Carenium — Patient Portal</title>
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  
+  <style>
+      body {
+          background: #0f172a;
+          color: white;
+          font-family: 'Inter', sans-serif;
+      }
+      .portal-header {
+          background: rgba(16, 185, 129, 0.1);
+          border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+          padding: 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      .portal-brand {
+          font-weight: 900;
+          font-size: 1.5rem;
+          color: #10b981;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+      }
+      .portal-welcome {
+          text-align: right;
+      }
+      .grid-layout {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 24px;
+          padding: 24px;
+          max-width: 1200px;
+          margin: 0 auto;
+      }
+      .glass-card {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 20px;
+          padding: 24px;
+      }
+      @media (max-width: 768px) {
+          .grid-layout { grid-template-columns: 1fr; }
+      }
+  </style>
+</head>
+
+<body>
+  <header class="portal-header">
+      <div class="portal-brand">
+          <div style="width: 40px; height: 40px; background: #10b981; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">C</div>
+          Carenium Patient
+      </div>
+      <div class="portal-welcome">
+          <h2 style="font-size: 14px; font-weight: bold;" id="patientName">Loading...</h2>
+          <button style="background:none; border:none; color: #ef4444; font-size: 12px; cursor: pointer; text-decoration:underline;" onclick="Auth.signOut()">Sign Out</button>
+      </div>
+  </header>
+
+  <div class="grid-layout">
+      <!-- Vitals Summary -->
+      <div class="glass-card" style="border-top: 4px solid #10b981;">
+          <h3 style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; margin-bottom: 16px; font-weight: 900;">Latest Vitals</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: rgba(0,0,0,0.2); p: 12px; border-radius: 12px;">
+              <span style="opacity: 0.7;">Heart Rate</span>
+              <span style="font-size: 24px; font-weight: 900; color: #ef4444;" id="ptHR">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: rgba(0,0,0,0.2); p: 12px; border-radius: 12px;">
+              <span style="opacity: 0.7;">Blood Oxygen</span>
+              <span style="font-size: 24px; font-weight: 900; color: #10b981;" id="ptO2">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); p: 12px; border-radius: 12px;">
+              <span style="opacity: 0.7;">Temperature</span>
+              <span style="font-size: 24px; font-weight: 900; color: #f59e0b;" id="ptTemp">--</span>
+          </div>
+      </div>
+
+      <!-- Prescriptions & Plan -->
+      <div class="glass-card" style="border-top: 4px solid #3b82f6;">
+          <h3 style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; margin-bottom: 16px; font-weight: 900;">Active Prescriptions</h3>
+          <div id="ptPrescriptions">
+              <div style="opacity: 0.5; text-align: center; padding: 24px;">No active prescriptions found.</div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script type="module">
+      import './src/supabase-config.js';
+      import { Auth } from './src/auth.js';
+      import { initPatientEngine } from './src/patient-portal.js';
+
+      window.Auth = Auth;
+      
+      document.addEventListener("DOMContentLoaded", async () => {
+          if (initPatientEngine) {
+             await initPatientEngine();
+          }
+      });
+  </script>
+</body>
+</html>
